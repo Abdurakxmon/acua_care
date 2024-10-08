@@ -2,6 +2,8 @@ import prophet
 import pandas as pd
 import joblib
 
+# pip install prophet 
+
 monthly_water_usage_model = joblib.load("mothly_water_usage_model.joblib")
 
 ds = monthly_water_usage_model.make_future_dataframe(periods=30)
