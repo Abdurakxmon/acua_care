@@ -32,3 +32,4 @@ class RegisterSerializer(serializers.ModelSerializer):
         Profile.objects.create(user=user, **profile_data)
 
         return user
+

@@ -14,8 +14,8 @@ months = list(range(1, 13))
 
 month_list = ["january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december"]
 year = 2020
-previous_month = "september"
-month_index = month_list.index(previous_month) + 1
+previous_month = "february"
+month_index = (month_list.index(previous_month) + 1) % len(month_list)
 next_month_index = month_index + 1
 
 pred_for_october = prediction_df[(prediction_df['ds'].dt.year == year) & (prediction_df['ds'].dt.month == next_month_index)]["yhat"]
