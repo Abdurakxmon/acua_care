@@ -5,28 +5,38 @@ import pandas as pd
 # pip install pandas scikit-learn joblib 
 
 #models should be load outside of the function and classes
-water_gradient_model = joblib.load("water_gradient_model.joblib")
-cooking_linear_model = joblib.load("cooking_linear_model.joblib")
-dish_linear_model = joblib.load("dish_linear_model.joblib")
-laundry_linear_model = joblib.load("laundry_gradient_model.joblib")
-showers_forest_model = joblib.load("showers_forest_model.joblib")
-toilet_linear_model = joblib.load("toilet_linear_model.joblib")
-sd_scaler = joblib.load("sd_scaler.joblib")
+water_gradient_model = joblib.load("models/water_forest_model.joblib")
+cooking_linear_model = joblib.load("models/cooking_forest_model.joblib")
+dish_linear_model = joblib.load("models/dish_forest_model.joblib")
+laundry_linear_model = joblib.load("models/laundry_forest_model.joblib")
+showers_forest_model = joblib.load("models/showers_linear_model.joblib")
+toilet_linear_model = joblib.load("models/toilet_forest_model.joblib")
+
+water_sd = joblib.load("scalers/water_sd_scaler.joblib")
+dish_sd = joblib.load("scalers/dish_sd_scaler.joblib")
+laundry_sd = joblib.load("scalers/laundry_sd_scaler.joblib")
+showers_sd = joblib.load("scalers/showers_sd_scaler.joblib")
+toilet_sd = joblib.load("scalers/toilet_sd_scaler.joblib")
+cooking_sd = joblib.load("scalers/cooking_sd_scaler.joblib")
 
 models_list = [water_gradient_model, cooking_linear_model, dish_linear_model, 
                 laundry_linear_model, showers_forest_model, toilet_linear_model]
 
+scalers_list = [water_sd, cooking_sd, dish_sd, laundry_sd, showers_sd, toilet_sd]
+features = ["Watering Garden", "Cooking", "Dishwashing", "Laundry", "Showers", "Toilet Flush"]
+
+
 # you can replace these sample values from ones which came from post request.
-sample_data = {"Family Size": [6], "Total Water Usage (Liters)": [1190]}
 
-df = pd.DataFrame(sample_data)
+for model, scaler, feature in zip(models_list, scalers_list, features):
+    family_size = int(input("Enter the your family size: "))
+    feature_times = int(input(f"How many time did you do {feature}: "))
+    sample_data = {"Family Size": [family_size], feature: feature_times}
+    df = pd.DataFrame(sample_data)
+    X_sample = df.values
+    X_sample_scaled = scaler.transform(X_sample)
 
-X_sample = df.values
-
-X_sample_scaled = sd_scaler.transform(X_sample)
-
-for model in models_list:
-    print(model.predict(X_sample_scaled)[0], "Liter")
+    print(model.predict(X_sample_scaled)[0], "Liter", feature, "Liter")
 
 
 # water prediction
@@ -48,6 +58,6 @@ df2 = pd.DataFrame(sample_data2)
 df2["pH_difference"] = abs(df2['ph'].values[0] - 7.0)
 df2['ratio_tds_to_hardness'] = df2['Solids'] / df2['Hardness']
 X_sample2 = df2
-
+[]
 water_prediction = water_quality_classifier.predict(X_sample2)[0]
 print("Water is:", classes[water_prediction])

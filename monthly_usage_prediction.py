@@ -17,6 +17,7 @@ year = 2020
 previous_month = "february"
 month_index = (month_list.index(previous_month) + 1) % len(month_list)
 next_month_index = month_index + 1
+print(next_month_index)
 
 pred_for_october = prediction_df[(prediction_df['ds'].dt.year == year) & (prediction_df['ds'].dt.month == next_month_index)]["yhat"]
 next_month_water_usage = pred_for_october.sum()
