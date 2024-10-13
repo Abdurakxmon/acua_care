@@ -11,5 +11,7 @@ urlpatterns = [
     path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 
-    path('settings/',views.ProtectedView.as_view(), name='protected'),
+    path('settings/',views.SettingsView.as_view(), name='settings'),
+    path('next_month/', views.NextMonthView.as_view(), name='next_month'),
+
 ]

@@ -1,13 +1,12 @@
 import json
-import joblib
 from channels.generic.websocket import AsyncWebsocketConsumer
 from rest_framework_simplejwt.tokens import AccessToken
-from django.contrib.auth.models import User
 from channels.db import database_sync_to_async
 import asyncio
 from rest_framework_simplejwt.exceptions import TokenError
-import os
-
+from .models import Profile
+from datetime import datetime
+from datetime import date
 
 
 class ChatConsumer(AsyncWebsocketConsumer):
@@ -34,10 +33,10 @@ class ChatConsumer(AsyncWebsocketConsumer):
             await self.close()
             return
 
-        user = await self.get_user(token['user_id'])
+        user = await self.get_profile(token['user_id'])
 
-        if user and user.is_authenticated:
-            self.scope['user'] = user
+        if user:
+            self.user= user
             await self.run_periodic_task()
         else:
             await self.close()
@@ -45,42 +44,30 @@ class ChatConsumer(AsyncWebsocketConsumer):
     async def disconnect(self, close_code):
         pass
 
-    async def receive(self, text_data):
-        text_data_json = json.loads(text_data)
-        message = text_data_json['message']
-        await self.send(text_data=json.dumps({
-            'message': message
-        }))
+    # async def receive(self, text_data):
+    #     text_data_json = json.loads(text_data)
+    #     message = text_data_json['message']
+    #     await self.send(text_data=json.dumps({
+    #         'message': message
+    #     }))
 
     async def run_periodic_task(self):
         while True:
-            monthly_water_usage_model = joblib.load("mothly_water_usage_model.joblib")
-
-            ds = monthly_water_usage_model.make_future_dataframe(periods=30)
-
-            prediction_df = monthly_water_usage_model.predict(ds)
-
-            month_list = ["january", "february", "march", "april", "may", "june", "july", "august", "september",
-                          "october", "november", "december"]
-            year = 2020
-            previous_month = "december"
-            month_index = (month_list.index(previous_month) + 1) % len(month_list)
-            next_month_index = month_index + 1
-
-            pred_for_next_month = prediction_df[
-                (prediction_df['ds'].dt.year == year) & (prediction_df['ds'].dt.month == next_month_index)
-            ]["yhat"]
-            next_month_water_usage = pred_for_next_month.sum()
-
+            now = datetime.now()
+            cur = now.hour*60+now.minute
+            ans=json.loads(self.user.total)[cur]
+            if self.user.day==date.today(): ans=json.loads(self.user.total_daily)[cur]
             await self.send(text_data=json.dumps({
-                'next_month': next_month_water_usage
+                'cur_spending': round(ans,2)
             }))
 
-            await asyncio.sleep(3600)
+            await asyncio.sleep(1800)
+
+
 
     @database_sync_to_async
-    def get_user(self, user_id):
+    def get_profile(self, user_id):
         try:
-            return User.objects.get(id=user_id)
-        except User.DoesNotExist:
+            return Profile.objects.get(user__id=user_id)
+        except Profile.DoesNotExist:
             return None

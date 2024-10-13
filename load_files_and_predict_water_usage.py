@@ -27,9 +27,8 @@ features = ["Watering Garden", "Cooking", "Dishwashing", "Laundry", "Showers", "
 
 
 # you can replace these sample values from ones which came from post request.
-
+family_size = int(input("Enter the your family size: "))
 for model, scaler, feature in zip(models_list, scalers_list, features):
-    family_size = int(input("Enter the your family size: "))
     feature_times = int(input(f"How many time did you do {feature}: "))
     sample_data = {"Family Size": [family_size], feature: feature_times}
     df = pd.DataFrame(sample_data)
@@ -42,22 +41,22 @@ for model, scaler, feature in zip(models_list, scalers_list, features):
 # water prediction
 
 # model should be loaded outside classes and funtions
-water_quality_classifier = joblib.load("rf_model_water_quality_classifier.jbl")
-
-classes = ["Not Potable", "Potable"]
-
-# actual_result = "Not portable"
-
-# you can replace these sample values from ones which came from post request.
-sample_data2 = {"ph": [8.316766], "Hardness": [214.373394], "Solids": [22018.417441], 
-"Chloramines": [8.059332], "Sulfate": [356.886136], "Conductivity": [363.266516],
- "Organic_carbon": [18.436524], "Trihalomethanes": [100.341674], "Turbidity": [4.628771	]}
-
-
-df2 = pd.DataFrame(sample_data2)
-df2["pH_difference"] = abs(df2['ph'].values[0] - 7.0)
-df2['ratio_tds_to_hardness'] = df2['Solids'] / df2['Hardness']
-X_sample2 = df2
-[]
-water_prediction = water_quality_classifier.predict(X_sample2)[0]
-print("Water is:", classes[water_prediction])
+# water_quality_classifier = joblib.load("rf_model_water_quality_classifier.jbl")
+#
+# classes = ["Not Potable", "Potable"]
+#
+# # actual_result = "Not portable"
+#
+# # you can replace these sample values from ones which came from post request.
+# sample_data2 = {"ph": [8.316766], "Hardness": [214.373394], "Solids": [22018.417441],
+# "Chloramines": [8.059332], "Sulfate": [356.886136], "Conductivity": [363.266516],
+#  "Organic_carbon": [18.436524], "Trihalomethanes": [100.341674], "Turbidity": [4.628771	]}
+#
+#
+# df2 = pd.DataFrame(sample_data2)
+# df2["pH_difference"] = abs(df2['ph'].values[0] - 7.0)
+# df2['ratio_tds_to_hardness'] = df2['Solids'] / df2['Hardness']
+# X_sample2 = df2
+# []
+# water_prediction = water_quality_classifier.predict(X_sample2)[0]
+# print("Water is:", classes[water_prediction])
