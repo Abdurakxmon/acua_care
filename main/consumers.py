@@ -55,11 +55,12 @@ class ChatConsumer(AsyncWebsocketConsumer):
         while True:
             now = datetime.now()
             cur = now.hour*60+now.minute
+
             ans=json.loads(self.user.total)[cur]
             if self.user.day==date.today(): ans=json.loads(self.user.total_daily)[cur]
-            await self.send(text_data=json.dumps({
-                'cur_spending': round(ans,2)
-            }))
+            await self.send(text_data=json.dumps(
+                ans
+            ))
 
             await asyncio.sleep(1800)
 

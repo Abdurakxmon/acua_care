@@ -9,7 +9,7 @@ import joblib
 import pandas as pd
 from main.models import Profile
 from datetime import date
-
+import json
 
 # {
 #     "first_name":"first_name",
@@ -79,7 +79,7 @@ class SettingsView(APIView):
             if i not in data:
                 return Response({"status": 0,"message": f"{i} field is required!"},status=status.HTTP_400_BAD_REQUEST)
 
-        time_values = [0 for hour in range(24*60)]
+        time_values = [{i:0 for i in ls[2:]} for hour in range(24*60)]
         features = ["Watering Garden", "Cooking", "Dishwashing", "Laundry", "Showers", "Toilet Flush"]
         per_values = {}
 
@@ -97,10 +97,12 @@ class SettingsView(APIView):
                 try:
                     a=j.split(":")
                     cur=int(a[0])*60+int(a[1])
-                    time_values[cur]+=per_values[i]
+                    time_values[cur][i]+=per_values[i]
                 except: continue
         for i in range(1,1440):
-            time_values[i]+=time_values[i-1]
+            for j in ls[2:]:
+                time_values[i][j]+=time_values[i-1][j]
+
 
         profile.number_of_people = data["number_of_people"]
         profile.watering_garden = data["watering_garden"]
@@ -112,10 +114,10 @@ class SettingsView(APIView):
 
         if data["daily"]:
             profile.day = date.today()
-            profile.total_daily = time_values
+            profile.total_daily = json.dumps(time_values)
         else:
             profile.day = None
-            profile.total = time_values
+            profile.total = json.dumps(time_values)
         profile.save()
 
         return Response({"status": 1})
